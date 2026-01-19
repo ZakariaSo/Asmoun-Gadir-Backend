@@ -1,14 +1,25 @@
 import jwt from "jsonwebtoken";
 
-export const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Accès refusé" });
+export const protect = (req, res, next) => {
+  let token;
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).json({ message: "Token invalide" });
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = decoded; // id, email, role
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Token invalide" });
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: "Accès non autorisé, token manquant" });
   }
 };

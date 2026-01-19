@@ -1,13 +1,16 @@
-export { default as User } from "./User.js";
-export { default as Activity } from "./Activity.js";
-export { default as Reservation } from "./Reservation.js";
-
 import User from "./User.js";
+import Accommodation from "./Accommodation.js";
 import Activity from "./Activity.js";
 import Reservation from "./Reservation.js";
 
-User.hasMany(Reservation);
-Reservation.belongsTo(User);
+User.hasOne(Accommodation, { foreignKey: "userId" });
+Accommodation.belongsTo(User);
 
-Activity.hasMany(Reservation);
-Reservation.belongsTo(Activity);
+Accommodation.hasMany(Activity, { foreignKey: "accommodationId" });
+Activity.belongsTo(Accommodation);
+
+User.hasMany(Reservation, { foreignKey: "touristId" });
+Reservation.belongsTo(User, { foreignKey: "touristId", as: "tourist" });
+
+Activity.hasMany(Reservation, { foreignKey: "activityId" });
+Reservation.belongsTo(Activity, { foreignKey: "activityId" });

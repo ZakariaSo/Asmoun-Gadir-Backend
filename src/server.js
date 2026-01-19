@@ -5,6 +5,8 @@ import { connectionDb } from "./config/database.js";
 import "./models/index.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import reservationRoutes from "./routes/reservationRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 
 dotenv.config(); // toujours en premier
 
@@ -18,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/activities", activityRoutes);
 
 const PORT = process.env.PORT || 5000;
 

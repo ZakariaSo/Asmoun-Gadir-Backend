@@ -27,53 +27,63 @@ const seed = async () => {
         const users = await User.bulkCreate([
             // Admin
             {
+                name: "Admin Asmoun",
                 email: "admin@asmoun-gadir.ma",
                 password: hashedPassword,
                 role: "admin",
             },
             // Organisateurs (propriétaires d'hébergements)
             {
+                name: "Omar El Atlas",
                 email: "hotel.atlas@gmail.com",
                 password: hashedPassword,
                 role: "organisateur",
             },
             {
+                name: "Fatima Sahara",
                 email: "riad.sahara@gmail.com",
                 password: hashedPassword,
                 role: "organisateur",
             },
             {
+                name: "Brahim Ocean",
                 email: "guesthouse.ocean@gmail.com",
                 password: hashedPassword,
                 role: "organisateur",
             },
             {
+                name: "Yassine Surf",
                 email: "hostel.surf@gmail.com",
                 password: hashedPassword,
                 role: "organisateur",
             },
             // Touristes
             {
+                name: "Pierre Dupont",
                 email: "pierre.dupont@gmail.com",
                 password: hashedPassword,
                 role: "touriste",
             },
             {
+                name: "Marie Martin",
                 email: "marie.martin@yahoo.fr",
                 password: hashedPassword,
                 role: "touriste",
             },
             {
+                name: "John Smith",
                 email: "john.smith@outlook.com",
                 password: hashedPassword,
                 role: "touriste",
             },
             {
+                name: "Sarah Wilson",
                 email: "sarah.wilson@gmail.com",
                 password: hashedPassword,
                 role: "touriste",
             },
             {
+                name: "Ahmed Benali",
                 email: "ahmed.benali@gmail.com",
                 password: hashedPassword,
                 role: "touriste",

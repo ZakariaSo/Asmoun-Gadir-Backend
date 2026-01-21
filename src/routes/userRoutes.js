@@ -1,13 +1,9 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
+import { getProfile } from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.get("/profile", protect, (req, res) => {
-  res.json({
-    message: "Accès autorisé",
-    user: req.user,
-  });
-});
+router.get("/profile", protect, getProfile);
 
 export default router;

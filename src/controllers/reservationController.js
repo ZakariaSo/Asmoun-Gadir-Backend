@@ -2,7 +2,7 @@ import Reservation from "../models/Reservation.js";
 import Activity from "../models/Activity.js";
 import User from "../models/User.js";
 
-// Créer une réservation
+
 export const createReservation = async (req, res) => {
   try {
     const { activityId, touristId, numberOfPlaces } = req.body;
@@ -13,19 +13,18 @@ export const createReservation = async (req, res) => {
       });
     }
 
-    // Vérifier si l'activité existe
     const activity = await Activity.findByPk(activityId);
     if (!activity) return res.status(404).json({ message: "Activity not found" });
 
-    // Vérifier les places disponibles
+   
     if (activity.availablePlaces < numberOfPlaces) {
       return res.status(400).json({ message: "Not enough available places" });
     }
 
-    // Calculer le prix total
+
     const totalPrice = activity.price * numberOfPlaces;
 
-    // Créer la réservation
+  
     const reservation = await Reservation.create({
       activityId,
       touristId,
@@ -47,12 +46,12 @@ export const createReservation = async (req, res) => {
   }
 };
 
-// Lister toutes les réservations
+
 export const getAllReservations = async (req, res) => {
   try {
     const reservations = await Reservation.findAll({
       include: [
-        { model: User, as: "tourist", attributes: ["id", "email", "nom", "prenom"] },
+        { model: User, as: "tourist", attributes: ["id", "email", "name"] },
         { model: Activity },
       ],
     });
@@ -64,13 +63,13 @@ export const getAllReservations = async (req, res) => {
   }
 };
 
-// Récupérer une réservation par ID
+
 export const getReservationById = async (req, res) => {
   try {
     const { id } = req.params;
     const reservation = await Reservation.findByPk(id, {
       include: [
-        { model: User, as: "tourist", attributes: ["id", "email", "nom", "prenom"] },
+        { model: User, as: "tourist", attributes: ["id", "email", "name"] },
         { model: Activity },
       ],
     });
@@ -84,7 +83,7 @@ export const getReservationById = async (req, res) => {
   }
 };
 
-// Mettre à jour le statut d'une réservation
+
 export const updateReservationStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -104,5 +103,33 @@ export const updateReservationStatus = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Error updating reservation", error: error.message });
+  }
+};
+
+
+export const getMyReservations = async (req, res) => {
+  try {
+    const touristId = req.user.id; 
+
+    const reservations = await Reservation.findAll({
+      where: {
+        touristId: touristId,
+      },
+      include: [
+        {
+          model: Activity,
+          attributes: ["id", "title", "description", "price", "dateStart", "duration", "meetingPoint"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.status(200).json(reservations);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des réservations:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des réservations",
+      error: error.message
+    });
   }
 };

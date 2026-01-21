@@ -3,15 +3,18 @@ import {
   createReservation,
   getAllReservations,
   getReservationById,
+  getMyReservations, 
   updateReservationStatus,
 } from "../controllers/reservationController.js";
+import { protect } from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 
-// Routes CRUD
-router.post("/", createReservation); // Créer une réservation
-router.get("/", getAllReservations); // Lister toutes les réservations
-router.get("/:id", getReservationById); // Récupérer une réservation par ID
-router.patch("/:id", updateReservationStatus); // Mettre à jour le statut
+// Routes 
+router.post("/", protect, createReservation); 
+router.get("/", getAllReservations); 
+router.get("/my-reservations", protect, getMyReservations); 
+router.get("/:id", getReservationById); 
+router.patch("/:id", updateReservationStatus); 
 
 export default router;

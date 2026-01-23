@@ -16,7 +16,7 @@ export const createReservation = async (req, res) => {
     const activity = await Activity.findByPk(activityId);
     if (!activity) return res.status(404).json({ message: "Activity not found" });
 
-   
+
     if (activity.availablePlaces < numberOfPlaces) {
       return res.status(400).json({ message: "Not enough available places" });
     }
@@ -24,7 +24,7 @@ export const createReservation = async (req, res) => {
 
     const totalPrice = activity.price * numberOfPlaces;
 
-  
+
     const reservation = await Reservation.create({
       activityId,
       touristId,
@@ -109,7 +109,7 @@ export const updateReservationStatus = async (req, res) => {
 
 export const getMyReservations = async (req, res) => {
   try {
-    const touristId = req.user.id; 
+    const touristId = req.user.id;
 
     const reservations = await Reservation.findAll({
       where: {
@@ -131,5 +131,60 @@ export const getMyReservations = async (req, res) => {
       message: "Erreur lors de la récupération des réservations",
       error: error.message
     });
+  }
+};
+
+export const updateReservation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { numberOfPlaces } = req.body;
+
+    const reservation = await Reservation.findByPk(id, { include: [Activity] });
+    if (!reservation) return res.status(404).json({ message: "Reservation not found" });
+
+    if (numberOfPlaces) {
+      const activity = reservation.Activity;
+      const diff = numberOfPlaces - reservation.numberOfPlaces;
+
+      if (activity.availablePlaces < diff) {
+        return res.status(400).json({ message: "Not enough available places" });
+      }
+
+      activity.availablePlaces -= diff;
+      await activity.save();
+
+      reservation.numberOfPlaces = numberOfPlaces;
+      reservation.totalPrice = activity.price * numberOfPlaces;
+    }
+
+    await reservation.save();
+    return res.status(200).json({ message: "Reservation updated", reservation });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error updating reservation", error: error.message });
+  }
+};
+
+export const deleteReservation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reservation = await Reservation.findByPk(id);
+    if (!reservation) return res.status(404).json({ message: "Reservation not found" });
+
+    // Return places to activity
+    const activity = await Activity.findByPk(reservation.activityId);
+    if (activity) {
+      activity.availablePlaces += reservation.numberOfPlaces;
+      if (activity.status === "full" && activity.availablePlaces > 0) {
+        activity.status = "published";
+      }
+      await activity.save();
+    }
+
+    await reservation.destroy();
+    return res.status(200).json({ message: "Reservation deleted" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error deleting reservation", error: error.message });
   }
 };
